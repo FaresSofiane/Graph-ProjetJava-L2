@@ -1,7 +1,9 @@
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Graph {
-
+    int x,y = 0;
+    Color couleur = Color.blue;
     String Name;
     ArrayList<Graph> Connection = new ArrayList<>();
 
@@ -49,6 +51,15 @@ public class Graph {
             this.Connection = temp;
         }
     }
+
+    public void setCoor(int x, int y){
+
+        this.x = x;
+        this.y = y;
+
+    }
+
+
 
 
 }
