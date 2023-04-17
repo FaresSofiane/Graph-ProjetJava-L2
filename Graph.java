@@ -17,11 +17,12 @@ public class Graph {
         this.Name = nameb;
     }
 
-    public void AddConnection(Graph Cible){
-
-        this.Connection.add(Cible);
-
+    public void AddConnection(Graph Cible) {
+        if (!this.Connection.contains(Cible)) {
+            this.Connection.add(Cible);
+        }
     }
+
 
     public void GetConnection(){
         int size = this.Connection.size();
@@ -49,21 +50,5 @@ public class Graph {
         }
     }
 
-    public static void main(String[] args) {
-        Graph g1 = new Graph("A");
-        Graph g2 = new Graph("B");
-        Graph g3 = new Graph("C");
-        Graph g4 = new Graph("D");
-        Graph g5 = new Graph("E");
-        g1.AddConnection(g2);
-        g1.AddConnection(g3);
-        g1.AddConnection(g4);
-        g1.AddConnection(g5);
-        g1.GetConnection();
-        g1.DelConnection(g3);
-        g1.GetConnection();
 
-        g2.GetConnection();
-
-    }
 }
