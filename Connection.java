@@ -37,6 +37,4 @@ public class Connection {
         return this.name;
     }
 
-
-
 }

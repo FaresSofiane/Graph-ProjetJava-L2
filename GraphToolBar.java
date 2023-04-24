@@ -44,11 +44,22 @@ public class GraphToolBar extends JToolBar {
         ToutEffacer.addActionListener(this::ToutEffacer_ae);
         tb.add( ToutEffacer );
 
+        tb.addSeparator();
+
+        JButton Connect = new JButton( new ImageIcon( "png/lien-connecte.png" ) );
+        Connect.setToolTipText( "Charger un graph" );
+        Connect.addActionListener(this::Connect_ae);
+        tb.add( Connect );
+
 
     }
     private Graph Ajouter(ActionEvent actionEvent) {
         this.state = "Ajouter";
         return null;
+    }
+
+    private void Connect_ae(ActionEvent actionEvent) {
+        this.state = "Connect";
     }
 
     private void Modifier_ae(ActionEvent actionEvent) {

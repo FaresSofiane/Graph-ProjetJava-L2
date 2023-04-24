@@ -7,6 +7,8 @@ public class GraphDisplay extends JFrame {
     ArrayList<Graph> Liste = new ArrayList<>();
     ArrayList<Connection> Liste_Connection = new ArrayList<>();
     Graph G1 = null;
+
+    Graph G1_Connection, G2_Connection = null;
     boolean est_maintenu = false;
     String state = "Ajouter";
     int Taille_Sommet = 20;
@@ -81,14 +83,23 @@ public class GraphDisplay extends JFrame {
 
                                 }
                             }
-                        } else if (tb.state.equals("Supprimer")) {
-
+                        }
+                        else if (tb.state.equals("Supprimer")) {
                             if (e.getX() > Taille_Sommet * 3 && e.getY() > Taille_Sommet * 3) {
                                 state = "Supprimer";
                                 ArrayList<Graph> temp = new ArrayList<>();
                                 for (int i = 0; i < Liste.size(); i++) {
                                     if (e.getX() >= Liste.get(i).x && e.getX() <= Liste.get(i).x + Taille_Sommet * 2) {
                                         if (e.getY() >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille_Sommet * 2) {
+
+
+                                            if (Liste_Connection.size() > 0) {
+                                                for (int j = 0; j < Liste_Connection.size(); j++) {
+                                                    if (Liste_Connection.get(j).g1 == Liste.get(i) || Liste_Connection.get(j).g2 == Liste.get(i)) {
+                                                        Liste_Connection.remove(j);
+                                                    }
+                                                }
+                                            }
                                             Liste.remove(i);
                                             break;
                                         }
@@ -108,6 +119,28 @@ public class GraphDisplay extends JFrame {
                                     }
                                 }
                             }
+                        } else if (tb.state.equals("Connect")){
+
+                                for (int i = 0; i < Liste.size(); i++) {
+                                    if (e.getX() >= Liste.get(i).x && e.getX() <= Liste.get(i).x + Taille_Sommet * 2) {
+                                        if (e.getY() >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille_Sommet * 2) {
+                                            if (G1_Connection == null){
+                                                G1_Connection = Liste.get(i);
+                                            }
+                                            else if (G2_Connection == null){
+                                                G2_Connection = Liste.get(i);
+                                            }
+
+                                            if (G1_Connection != null && G2_Connection != null){
+                                                Connection C = new Connection(G1_Connection,G2_Connection);
+                                                Liste_Connection.add(C);
+                                                G1_Connection = null;
+                                                G2_Connection = null;
+                                                repaint();
+                                            }
+                                        }
+                                    }
+                                }
                         }
                     }
                 }
@@ -159,10 +192,21 @@ public class GraphDisplay extends JFrame {
             g.setFont(new Font("Arial", Font.PLAIN, 24));
             g.drawString(this.Liste.get(i).getName(), textX, textY);
         }
+
+        for (int i = 0; i < this.Liste_Connection.size(); i++) {
+            int x1 = this.Liste_Connection.get(i).getG1().x + Taille_Sommet;
+            int y1 = (int) (this.Liste_Connection.get(i).getG1().y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2 + Taille_Sommet);
+            int x2 = this.Liste_Connection.get(i).getG2().x + Taille_Sommet;
+            int y2 = (int) (this.Liste_Connection.get(i).getG2().y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2 + Taille_Sommet);
+            g.drawLine(x1, y1, x2, y2);
+            g.setColor(this.Liste_Connection.get(i).getCouleur());
+
+        }
     }
 
 
     public static void main(String[] args) {
+
         new GraphDisplay();
     }
 }
