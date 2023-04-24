@@ -1,19 +1,8 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.UIManager;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 public class GraphToolBar extends JToolBar {
     JToolBar tb = new JToolBar();
@@ -34,22 +23,20 @@ public class GraphToolBar extends JToolBar {
         tb.add( btnSaveAs );
 
         tb.addSeparator();
+
         JButton Ajouter = new JButton( new ImageIcon( "png/creation.png") );
         Ajouter.setToolTipText( "Ajouter un sommet" );
         Ajouter.addActionListener(this::Ajouter);
-
         tb.add( Ajouter );
 
         JButton Modifier = new JButton( new ImageIcon( "png/pencil.png" ) );
         Modifier.addActionListener(this::Modifier_ae);
         Modifier.setToolTipText( "Modifier" );
-
         tb.add( Modifier );
 
         JButton Supprimer = new JButton( new ImageIcon( "png/remove.png" ) );
         Supprimer.addActionListener(this::Supprimer_ae);
         Supprimer.setToolTipText( "Supprimer" );
-
         tb.add( Supprimer );
 
         JButton ToutEffacer = new JButton( new ImageIcon( "png/delete-all.png" ) );
@@ -61,16 +48,29 @@ public class GraphToolBar extends JToolBar {
     }
     private Graph Ajouter(ActionEvent actionEvent) {
         this.state = "Ajouter";
-    return null;}
-    private void Modifier_ae(ActionEvent actionEvent) {
-        this.state = "Modifier";    }
-    private void ToutEffacer_ae(ActionEvent actionEvent) {
-this.state = "ToutEffacer";    }
-    private void Supprimer_ae(ActionEvent actionEvent) {
-this.state = "Supprimer";
+        return null;
     }
 
+    private void Modifier_ae(ActionEvent actionEvent) {
+        this.state = "Modifier";
+    }
 
+    private void ToutEffacer_ae(ActionEvent actionEvent) {
+        this.state = "ToutEffacer";
+
+    }
+
+    private void Supprimer_ae(ActionEvent actionEvent) {
+        this.state = "Supprimer";
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 
     public JToolBar getToolBar() {
         return tb;
