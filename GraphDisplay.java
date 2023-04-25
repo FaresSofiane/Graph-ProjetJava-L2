@@ -6,6 +6,7 @@ import javax.swing.*;
 public class GraphDisplay extends JFrame {
     ArrayList<Graph> Liste = new ArrayList<>();
     ArrayList<Connection> Liste_Connection = new ArrayList<>();
+    ArrayList<Connection> temp_Liste_Connection = new ArrayList<>();
     Graph G1 = null;
 
     Graph G1_Connection, G2_Connection = null;
@@ -92,16 +93,19 @@ public class GraphDisplay extends JFrame {
                                     if (e.getX() >= Liste.get(i).x && e.getX() <= Liste.get(i).x + Taille_Sommet * 2) {
                                         if (e.getY() >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille_Sommet * 2) {
 
-
+                                            System.out.println(Liste_Connection.size());
                                             if (Liste_Connection.size() > 0) {
                                                 for (int j = 0; j < Liste_Connection.size(); j++) {
-                                                    if (Liste_Connection.get(j).g1 == Liste.get(i) || Liste_Connection.get(j).g2 == Liste.get(i)) {
-                                                        Liste_Connection.remove(j);
+                                                    if (Liste_Connection.get(j).g1 != Liste.get(i) && Liste_Connection.get(j).g2 != Liste.get(i)) {
+                                                        temp_Liste_Connection.add(Liste_Connection.get(j));
                                                     }
                                                 }
+                                                Liste_Connection.clear();
+                                                Liste_Connection.addAll(temp_Liste_Connection);
+                                                temp_Liste_Connection.clear();
+
                                             }
                                             Liste.remove(i);
-                                            break;
                                         }
                                     }
                                 }
@@ -142,9 +146,75 @@ public class GraphDisplay extends JFrame {
                                     }
                                 }
                         }
+                        else if (tb.state.equals("Edit_Connect")){
+                            for (int i = 0; i < Liste_Connection.size(); i++) {
+                                if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + Taille_Sommet * 2) {
+                                    if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + Taille_Sommet * 2) {
+                                        Liste_Connection.remove(i);
+                                        repaint();
+                                    }
+                                }
+                            }
+                    } else if (tb.state.equals("Add_Text_Connect")) {
+                            if (e.getX() > Taille_Sommet * 3 && e.getY() > Taille_Sommet * 3) {
+                                state = "Add_Text_Connect";
+                                for (int i = 0; i < Liste_Connection.size(); i++) {
+                                    if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + Taille_Sommet * 2) {
+                                        if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + Taille_Sommet * 2) {
+                                            textField = new JTextField();
+                                            textField.setBounds(265, 50, 100, 30);
+                                            textField.setVisible(true);
+                                            panel.add(textField);
+                                            final int index = i;
+                                            textField.addActionListener(new ActionListener() {
+                                                @Override
+                                                public void actionPerformed(ActionEvent x) {
+                                                    String text = textField.getText();
+                                                    textField.setVisible(false);
+                                                    Liste_Connection.get(index).setName(text);
+                                                    repaint();
+                                                }
+                                            });
+                                            repaint();
+                                        }
+                                    }
+                                }
+                            }
+
+                    } else if (tb.state.equals("Change_Color_Connect")){
+
+                            if (e.getX() > Taille_Sommet * 3 && e.getY() > Taille_Sommet * 3) {
+                                state = "Change_Color_Connect";
+                                for (int i = 0; i < Liste_Connection.size(); i++) {
+                                    if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + Taille_Sommet * 2) {
+                                        if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + Taille_Sommet * 2) {
+                                            b = new JButton("Couleur");
+                                            b.setBounds(100, 50, 100, 30);
+                                            final int index = i;
+                                            b.addActionListener(new ActionListener() {
+                                                @Override
+                                                public void actionPerformed(ActionEvent e) {
+                                                    c = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue);
+                                                    Liste_Connection.get(index).setCouleur(c);
+                                                    b.setVisible(false);
+                                                }
+                                            });
+                                            panel.add(b);
+                                            b.setVisible(true);
+
+
+                                            repaint();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
                     }
                 }
-            }
+
 
             @Override
             public void mouseReleased(MouseEvent e){
@@ -174,7 +244,28 @@ public class GraphDisplay extends JFrame {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
+        for (int i = 0; i < this.Liste_Connection.size(); i++) {
+            int x1 = this.Liste_Connection.get(i).getG1().x + Taille_Sommet;
+            int y1 = (int) (this.Liste_Connection.get(i).getG1().y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2 + Taille_Sommet);
+            int x2 = this.Liste_Connection.get(i).getG2().x + Taille_Sommet;
+            int y2 = (int) (this.Liste_Connection.get(i).getG2().y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2 + Taille_Sommet);
 
+            // épaissir la ligne
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setStroke(new BasicStroke(3));
+            g2.drawLine(x1, y1, x2, y2);
+
+            if (Liste_Connection.get(i).getName() != null){
+                g2.drawString(Liste_Connection.get(i).getName(),(x1+x2)/2,(y1+y2)/2);
+
+            }
+
+
+            g2.setColor(this.Liste_Connection.get(i).getCouleur());
+
+            System.out.println(Liste_Connection.get(i).g1.getName() + " " + Liste_Connection.get(i).g2.getName());
+
+        }
         for (int i = 0; i < this.Liste.size(); i++) {
             int x = this.Liste.get(i).x;
             int y = (int) (this.Liste.get(i).y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2);
@@ -192,16 +283,8 @@ public class GraphDisplay extends JFrame {
             g.setFont(new Font("Arial", Font.PLAIN, 24));
             g.drawString(this.Liste.get(i).getName(), textX, textY);
         }
+        System.out.println("//");
 
-        for (int i = 0; i < this.Liste_Connection.size(); i++) {
-            int x1 = this.Liste_Connection.get(i).getG1().x + Taille_Sommet;
-            int y1 = (int) (this.Liste_Connection.get(i).getG1().y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2 + Taille_Sommet);
-            int x2 = this.Liste_Connection.get(i).getG2().x + Taille_Sommet;
-            int y2 = (int) (this.Liste_Connection.get(i).getG2().y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2 + Taille_Sommet);
-            g.drawLine(x1, y1, x2, y2);
-            g.setColor(this.Liste_Connection.get(i).getCouleur());
-
-        }
     }
 
 

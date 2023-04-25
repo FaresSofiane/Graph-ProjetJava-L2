@@ -47,12 +47,39 @@ public class GraphToolBar extends JToolBar {
         tb.addSeparator();
 
         JButton Connect = new JButton( new ImageIcon( "png/lien-connecte.png" ) );
-        Connect.setToolTipText( "Charger un graph" );
+        Connect.setToolTipText( "Relié deux sommet" );
         Connect.addActionListener(this::Connect_ae);
         tb.add( Connect );
 
+        JButton Edit_Connect = new JButton( new ImageIcon( "png/lien-delete.png" ) );
+        Edit_Connect.setToolTipText( "modifier un lien" );
+        Edit_Connect.addActionListener(this::Edit_Connect_ae);
+        tb.add( Edit_Connect );
+
+        JButton Add_Text_Connect = new JButton( new ImageIcon( "png/lien-add-text.png" ) );
+        Add_Text_Connect.setToolTipText( "Ajouter un texte a un lien" );
+        Add_Text_Connect.addActionListener(this::Add_Text_Connect_ae);
+        tb.add( Add_Text_Connect );
+
+        JButton Change_Color_Connect = new JButton( new ImageIcon( "png/lien-color.png" ) );
+        Change_Color_Connect.setToolTipText( "Change la couleur d'un lien" );
+        Change_Color_Connect.addActionListener(this::Change_Color_Connect_ae);
+        tb.add( Change_Color_Connect );
 
     }
+
+    private void Change_Color_Connect_ae(ActionEvent actionEvent) {
+        this.state = "Change_Color_Connect";
+    }
+
+    private void Add_Text_Connect_ae(ActionEvent actionEvent) {
+        this.state = "Add_Text_Connect";
+    }
+
+    private void Edit_Connect_ae(ActionEvent actionEvent) {
+        this.state = "Edit_Connect";
+    }
+
     private Graph Ajouter(ActionEvent actionEvent) {
         this.state = "Ajouter";
         return null;
