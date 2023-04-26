@@ -13,6 +13,7 @@ public class GraphToolBar extends JToolBar {
         JButton btnCharge = new JButton( new ImageIcon( "png/data-storage.png") );
         btnCharge.setToolTipText( "Enregistrer sous" );
         tb.add( btnCharge );
+        btnCharge.addActionListener(this::SaveAs);
 
         JButton btnSave = new JButton( new ImageIcon( "png/save-data.png" ) );
         btnSave.setToolTipText( "Enregistrer" );
@@ -65,6 +66,11 @@ public class GraphToolBar extends JToolBar {
         Change_Color_Connect.setToolTipText( "Change la couleur d'un lien" );
         Change_Color_Connect.addActionListener(this::Change_Color_Connect_ae);
         tb.add( Change_Color_Connect );
+
+    }
+
+    private void SaveAs(ActionEvent actionEvent) {
+        
 
     }
 
