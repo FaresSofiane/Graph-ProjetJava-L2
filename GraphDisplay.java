@@ -8,92 +8,181 @@ public class GraphDisplay extends JFrame {
     ArrayList<Connection> Liste_Connection = new ArrayList<>();
     ArrayList<Connection> temp_Liste_Connection = new ArrayList<>();
     Graph G1 = null;
-
+    int Taille = 40;
     Graph G1_Connection, G2_Connection = null;
     boolean est_maintenu = false;
     String state = "Ajouter";
-    int Taille_Sommet = 20;
-    Dimension Dimension_ToolBar;
     JTextField textField = null;
     JButton b;
-    JTextArea ta;
     Boolean mouse_ajoute_enable = true;
     Color c = Color.blue;
+    Color c2 = Color.blue;
+    JPanel panel = new JPanel();
+    JToolBar tb = new JToolBar();
+
     public GraphDisplay() {
-        JPanel panel = new JPanel();
+
+        super("Graph Display");
         this.add(panel);
-        GraphToolBar tb = new GraphToolBar();
-        this.add(tb.getToolBar(), BorderLayout.NORTH);
-        Dimension_ToolBar = tb.Taille();
+        this.add(tb, BorderLayout.NORTH);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(800, 600);
+        this.setVisible(true);
+
+        Dimension Dimension_MenuBar = tb.getSize();
+        tb.setFloatable(false);
+        JButton btnCharge = new JButton( new ImageIcon( "png/data-storage.png") );
+        btnCharge.setToolTipText( "Enregistrer sous" );
+        tb.add(btnCharge);
+        JButton btnSave = new JButton( new ImageIcon( "png/save-data.png" ) );
+        btnSave.setToolTipText( "Enregistrer" );
+        tb.add(btnSave);
+        JButton btnSaveAs = new JButton( new ImageIcon( "png/file-backup.png" ) );
+        btnSaveAs.setToolTipText( "Charger un graph" );
+        tb.add(btnSaveAs);
+        tb.addSeparator();
+        JButton ajouter = new JButton(new ImageIcon("png/creation.png"));
+        ajouter.setToolTipText("Ajouter un sommet");
+        ajouter.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                state = "Ajouter";
+            }
+        });
+        tb.add(ajouter);
+        JButton Modifier = new JButton( new ImageIcon( "png/pencil.png" ) );
+        Modifier.setToolTipText( "Modifier" );
+        Modifier.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                state = "Modifier";
+            }
+        });
+        tb.add(Modifier);
+        JButton Supprimer = new JButton( new ImageIcon( "png/remove.png" ) );
+        Supprimer.setToolTipText( "Supprimer" );
+        Supprimer.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                state = "Supprimer";
+            }
+        });
+        tb.add(Supprimer);
+        JButton ToutEffacer = new JButton( new ImageIcon( "png/delete-all.png" ) );
+        ToutEffacer.setToolTipText( "Charger un graph" );
+        ToutEffacer.addActionListener(  e -> {
+            state = "ToutEffacer";
+            Liste.clear();
+            Liste_Connection.clear();
+            temp_Liste_Connection.clear();
+            repaint();
+                }
+        );
+        tb.add(ToutEffacer);
+        tb.addSeparator();
+        JButton Connect = new JButton( new ImageIcon( "png/lien-connecte.png" ) );
+        Connect.setToolTipText( "Relié deux sommet" );
+        Connect.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                state = "Connect";
+            }
+        });
+        tb.add(Connect);
+        JButton Edit_Connect = new JButton( new ImageIcon( "png/lien-delete.png" ) );
+        Edit_Connect.setToolTipText( "modifier un lien" );
+        Edit_Connect.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                state = "Edit_Connect";
+            }
+        });
+        tb.add(Edit_Connect);
+        JButton Add_Text_Connect = new JButton( new ImageIcon( "png/lien-add-text.png" ) );
+        Add_Text_Connect.setToolTipText( "Ajouter un texte a un lien" );
+        Add_Text_Connect.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                state = "Add_Text_Connect";
+            }
+        });
+        tb.add(Add_Text_Connect);
+        JButton Change_Color_Connect = new JButton( new ImageIcon( "png/lien-color.png" ) );
+        Change_Color_Connect.setToolTipText( "Change la couleur d'un lien" );
+        Change_Color_Connect.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                state = "Change_Color_Connect";
+            }
+        });
+        tb.add(Change_Color_Connect);
+
 
         panel.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (tb.state.equals("ToutEffacer")) {
-                    Liste.clear();
-                    repaint();
-                } else {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        if (tb.state.equals("Ajouter")) {
-                            if (mouse_ajoute_enable) {
-                                mouse_ajoute_enable = false;
-                                if (e.getX() > Taille_Sommet * 3 && e.getY() > Taille_Sommet * 3) {
-                                    b = new JButton("Couleur");
-                                    b.setBounds(100, 50, 100, 30);
-                                    b.addActionListener(new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            c = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue);
+                        if (state.equals("Ajouter")) {
+                            if (mouse_ajoute_enable) { // verifie si on a déja cliqué sur le bouton ajouter
+                                mouse_ajoute_enable = false; // on désactive le bouton ajouter
+                                Graph g = new Graph(); // on crée un nouveau point
+                                g.setCoor(e.getX(), e.getY());  // on lui donne les coordonnées du clique
+                                g.setCouleur(c); // couleur de base bleu
+                                Liste.add(g); // on l'ajoute a la liste
+                                repaint(); // on actualise la page afin d'afficher le point mais sans nom il sera rajouté aprés avec la possibilité de changer la couleur
+                                b = new JButton("Couleur");// creation du bouton pour choisir la couleur
+                                b.setBounds(100, 50, 100, 30); // position du bouton
+                                b.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        c = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue); // on ouvre la fenetre de choix de couleur
+                                    }
+                                });
+                                JLabel Text = new JLabel("Nom :");
+                                Text.setBounds(230, 50, 100, 30);
+                                Text.setVisible(true);
+                                panel.add(Text);
+                                JLabel Text2 = new JLabel("Faites Enter pour valider");
+                                Text2.setBounds(200, 75, 100, 150);
+                                Text2.setVisible(true);
+                                textField = new JTextField();
+                                textField.setBounds(265, 50, 100, 30);
+                                textField.setVisible(true);
+                                panel.add(textField);
+                                panel.add(Text2);
+                                panel.add(b);
+                                textField.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent x) {
+                                        String text = textField.getText();
+                                        textField.setVisible(false);
+                                        b.setVisible(false);
+                                        Text.setVisible(false);
+                                        Text2.setVisible(false);
+                                        for (int z = 0; z<Liste.size(); z++){
+                                            if (Liste.get(z) == g){
+                                                Liste.get(z).ChangeName(text);
+                                                Liste.get(z).setCouleur(c);
+                                            }
                                         }
-                                    });
-                                    JLabel Text = new JLabel("Nom :");
-                                    Text.setBounds(230, 50, 100, 30);
-                                    Text.setVisible(true);
-                                    panel.add(Text);
-                                    JLabel Text2 = new JLabel("Faites Enter pour valider");
-                                    Text2.setBounds(200, 75, 100, 150);
-                                    Text2.setVisible(true);
-                                    panel.add(Text2);
-                                    panel.add(b);
-                                    panel.setLayout(null);
-                                    panel.setSize(400, 800);
-                                    panel.setVisible(true);
-
-                                    textField = new JTextField();
-                                    textField.setBounds(265, 50, 100, 30);
-                                    textField.setVisible(true);
-                                    panel.add(textField);
-                                    textField.addActionListener(new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent x) {
-                                            String text = textField.getText();
-                                            textField.setVisible(false);
-                                            b.setVisible(false);
-                                            Text.setVisible(false);
-                                            Text2.setVisible(false);
-                                            Graph g = new Graph(textField.getText());
-                                            g.setCoor(e.getX() - Taille_Sommet, e.getY() - Taille_Sommet);
-                                            g.setCouleur(c);
-                                            Liste.add(g);
-                                            repaint();
-                                            mouse_ajoute_enable = true;
-                                        }
-                                    });
 
 
-                                }
+                                        repaint();
+                                        mouse_ajoute_enable = true;
+                                    }
+                                });
+
                             }
                         }
-                        else if (tb.state.equals("Supprimer")) {
-                            if (e.getX() > Taille_Sommet * 3 && e.getY() > Taille_Sommet * 3) {
+                        else if (state.equals("Supprimer")) {
                                 state = "Supprimer";
                                 ArrayList<Graph> temp = new ArrayList<>();
                                 for (int i = 0; i < Liste.size(); i++) {
-                                    if (e.getX() >= Liste.get(i).x && e.getX() <= Liste.get(i).x + Taille_Sommet * 2) {
-                                        if (e.getY() >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille_Sommet * 2) {
+                                    if (e.getX() >= Liste.get(i).x + 10 && e.getX() <= Liste.get(i).x + Taille + 10) {
+                                        if (e.getY() + Dimension_MenuBar.height + (Taille - 10) >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille ) {
 
-                                            System.out.println(Liste_Connection.size());
+
                                             if (Liste_Connection.size() > 0) {
                                                 for (int j = 0; j < Liste_Connection.size(); j++) {
                                                     if (Liste_Connection.get(j).g1 != Liste.get(i) && Liste_Connection.get(j).g2 != Liste.get(i)) {
@@ -107,60 +196,59 @@ public class GraphDisplay extends JFrame {
                                             }
                                             Liste.remove(i);
                                         }
-                                    }
+
                                 }
                             }
                             repaint();
-                        } else if (tb.state.equals("Modifier")) {
-                            if (e.getX() > Taille_Sommet * 3 && e.getY() > Taille_Sommet * 3) {
+                        } else if (state.equals("Modifier")) {
                                 state = "Modifier";
+                                System.out.println("Taille toolbar :" + tb.getSize());
                                 for (int i = 0; i < Liste.size(); i++) {
-                                    if (e.getX() >= Liste.get(i).x && e.getX() <= Liste.get(i).x + Taille_Sommet * 2) {
-                                        if (e.getY() >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille_Sommet * 2) {
+                                    if (e.getX() >= Liste.get(i).x + 10 && e.getX() <= Liste.get(i).x + Taille + 10) {
+                                        if (e.getY() + Dimension_MenuBar.height + (Taille - 10) >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille ) {
                                             G1 = Liste.get(i);
                                             est_maintenu = true;
                                         }
                                     }
-                                }
+
                             }
-                        } else if (tb.state.equals("Connect")){
+                        } else if (state.equals("Connect")){
 
-                                for (int i = 0; i < Liste.size(); i++) {
-                                    if (e.getX() >= Liste.get(i).x && e.getX() <= Liste.get(i).x + Taille_Sommet * 2) {
-                                        if (e.getY() >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille_Sommet * 2) {
-                                            if (G1_Connection == null){
-                                                G1_Connection = Liste.get(i);
-                                            }
-                                            else if (G2_Connection == null){
-                                                G2_Connection = Liste.get(i);
-                                            }
+                            for (int i = 0; i < Liste.size(); i++) {
+                                if (e.getX() >= Liste.get(i).x + 10 && e.getX() <= Liste.get(i).x + Taille + 10) {
+                                    if (e.getY() + Dimension_MenuBar.height + (Taille - 10) >= Liste.get(i).y && e.getY() <= Liste.get(i).y + Taille ) {
+                                        if (G1_Connection == null){
+                                            G1_Connection = Liste.get(i);
+                                        }
+                                        else if (G2_Connection == null){
+                                            G2_Connection = Liste.get(i);
+                                        }
 
-                                            if (G1_Connection != null && G2_Connection != null){
-                                                Connection C = new Connection(G1_Connection,G2_Connection);
-                                                Liste_Connection.add(C);
-                                                G1_Connection = null;
-                                                G2_Connection = null;
-                                                repaint();
-                                            }
+                                        if (G1_Connection != null && G2_Connection != null){
+                                            Connection C = new Connection(G1_Connection,G2_Connection);
+                                            Liste_Connection.add(C);
+                                            G1_Connection = null;
+                                            G2_Connection = null;
+                                            repaint();
                                         }
                                     }
                                 }
+                            }
                         }
-                        else if (tb.state.equals("Edit_Connect")){
+                        else if (state.equals("Edit_Connect")){
                             for (int i = 0; i < Liste_Connection.size(); i++) {
-                                if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + Taille_Sommet * 2) {
-                                    if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + Taille_Sommet * 2) {
+                                if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + 20 * 2) {
+                                    if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + 20 * 2) {
                                         Liste_Connection.remove(i);
                                         repaint();
                                     }
                                 }
                             }
-                    } else if (tb.state.equals("Add_Text_Connect")) {
-                            if (e.getX() > Taille_Sommet * 3 && e.getY() > Taille_Sommet * 3) {
+                        } else if (state.equals("Add_Text_Connect")) {
                                 state = "Add_Text_Connect";
                                 for (int i = 0; i < Liste_Connection.size(); i++) {
-                                    if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + Taille_Sommet * 2) {
-                                        if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + Taille_Sommet * 2) {
+                                    if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + 20 * 2) {
+                                        if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + 20 * 2) {
                                             textField = new JTextField();
                                             textField.setBounds(265, 50, 100, 30);
                                             textField.setVisible(true);
@@ -178,42 +266,39 @@ public class GraphDisplay extends JFrame {
                                             repaint();
                                         }
                                     }
-                                }
+
                             }
 
-                    } else if (tb.state.equals("Change_Color_Connect")){
-
-                            if (e.getX() > Taille_Sommet * 3 && e.getY() > Taille_Sommet * 3) {
+                        } else if (state.equals("Change_Color_Connect")){
                                 state = "Change_Color_Connect";
                                 for (int i = 0; i < Liste_Connection.size(); i++) {
-                                    if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + Taille_Sommet * 2) {
-                                        if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + Taille_Sommet * 2) {
+                                    if (e.getX() >= Liste_Connection.get(i).getG1().x && e.getX() <= Liste_Connection.get(i).getG2().x + 20 * 2) {
+                                        if (e.getY() >= Liste_Connection.get(i).g1.y && e.getY() <= Liste_Connection.get(i).getG2().y + 20 * 2) {
                                             b = new JButton("Couleur");
                                             b.setBounds(100, 50, 100, 30);
                                             final int index = i;
                                             b.addActionListener(new ActionListener() {
                                                 @Override
                                                 public void actionPerformed(ActionEvent e) {
-                                                    c = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue);
-                                                    Liste_Connection.get(index).setCouleur(c);
+                                                    c2 = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue);
+                                                    Liste_Connection.get(index).setCouleur(c2);
                                                     b.setVisible(false);
+                                                    repaint();
                                                 }
                                             });
                                             panel.add(b);
                                             b.setVisible(true);
-
-
                                             repaint();
                                         }
                                     }
-                                }
+
                             }
                         }
 
                     }
 
-                    }
                 }
+
 
 
             @Override
@@ -229,61 +314,39 @@ public class GraphDisplay extends JFrame {
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
+                System.out.println("X : " + e.getX() + " Y : " + e.getY());
                 if (est_maintenu && G1 != null){
-                    G1.setCoor(e.getX()-Taille_Sommet,e.getY()-Taille_Sommet );
-                    repaint();
+                    if  (e.getY() <0){
+
+                G1.setCoor(e.getX() - 20,  0 + Dimension_MenuBar.height + Taille);
+                        repaint();
+                    } else {
+
+                        G1.setCoor(e.getX() - 20, e.getY() - 20);
+                        repaint();
+                    }
                 }
             }
         });
 
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(600, 600);
-        this.setVisible(true);
-        Dimension_ToolBar = tb.Taille();
+
     }
+
+
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         for (int i = 0; i < this.Liste_Connection.size(); i++) {
-            int x1 = this.Liste_Connection.get(i).getG1().x + Taille_Sommet;
-            int y1 = (int) (this.Liste_Connection.get(i).getG1().y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2 + Taille_Sommet);
-            int x2 = this.Liste_Connection.get(i).getG2().x + Taille_Sommet;
-            int y2 = (int) (this.Liste_Connection.get(i).getG2().y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2 + Taille_Sommet);
-
-            // épaissir la ligne
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setStroke(new BasicStroke(3));
-            g2.drawLine(x1, y1, x2, y2);
-
-            if (Liste_Connection.get(i).getName() != null){
-                g2.drawString(Liste_Connection.get(i).getName(),(x1+x2)/2,(y1+y2)/2);
-
-            }
-
-
-            g2.setColor(this.Liste_Connection.get(i).getCouleur());
-
-            System.out.println(Liste_Connection.get(i).g1.getName() + " " + Liste_Connection.get(i).g2.getName());
-
+            Liste_Connection.get(i).Create(g, tb.getSize().height, Taille);
         }
-        for (int i = 0; i < this.Liste.size(); i++) {
-            int x = this.Liste.get(i).x;
-            int y = (int) (this.Liste.get(i).y + Dimension_ToolBar.getHeight()+Taille_Sommet + Taille_Sommet/2);
-            g.drawOval(x, y, Taille_Sommet * 2, Taille_Sommet * 2);
-            g.setColor(this.Liste.get(i).getCouleur());
-            g.fillOval(x, y, Taille_Sommet * 2, Taille_Sommet * 2);
-            FontMetrics fm = g.getFontMetrics();
-            int textWidth = fm.stringWidth(this.Liste.get(i).getName());
-            int textHeight = fm.getHeight();
-            int centerX = x + Taille_Sommet;
-            int centerY = y + Taille_Sommet;
-            int textX = centerX - (textWidth / 2);
-            int textY = centerY + (textHeight / 4);
-            g.setColor(Color.BLACK);
-            g.setFont(new Font("Arial", Font.PLAIN, 24));
-            g.drawString(this.Liste.get(i).getName(), textX, textY);
+        for (int i = 0; i < Liste.size(); i++) {
+            Liste.get(i).Create(g, tb.getSize().height , Taille);
         }
-        System.out.println("//");
+
+
+
+
 
     }
 
