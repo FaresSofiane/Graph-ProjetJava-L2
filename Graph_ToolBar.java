@@ -11,6 +11,7 @@ public class Graph_ToolBar extends JToolBar {
     private static final String RENAME_STATE = "Renommer";
     private static final String DELETE_STATE = "Supprimer";
     private static final String CONNECT_STATE = "Relier";
+    private static final String COLOR_STATE = "Couleur";
 
 
 
@@ -34,7 +35,8 @@ public class Graph_ToolBar extends JToolBar {
                 addButton(new ImageIcon("png/ajouter.png"), "Ajouter un sommet", e -> setState(ADD_STATE)),
                 addButton(new ImageIcon("png/deplacer.png"), "Modifier un sommet", e -> setState(MODIFY_STATE)),
                 addButton(new ImageIcon("png/renommer.png"), "Renommer un sommet", e -> setState(RENAME_STATE)),
-                addButton(new ImageIcon("png/effacer.png"), "Supprimer", e -> setState(DELETE_STATE)),
+                addButton(new ImageIcon("png/couleur.png"), "Changer la couleur d'un sommet", e -> setState(COLOR_STATE)),
+                addButton(new ImageIcon("png/effacer.png"), "Supprimer un sommet", e -> setState(DELETE_STATE)),
         };
 
         addSeparator();
@@ -67,55 +69,13 @@ public class Graph_ToolBar extends JToolBar {
         return button;
     }
 
-    private void setState(String state) {
+    public void setState(String state) {
         this.state = state;
     }
 
     public String getState() {
         return state;
     }
-/*
-    private void SaveAs(){
-        System.out.println("SaveAs");
-    }
-
-private ActionListener SaveAs = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-                if (file == null) {
-                    xml = new XML_Graph(GraphDisplay.G.getSommets());
-                    xml.createXML();
-                } else {
-                    System.out.println("Save");
-                }
-            }
-
-    };
-
-   private ActionListener Save = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (file == null) {
-                xml = new XML_Graph(GraphDisplay.G.getSommets());
-                xml.createXML();
-            } else {
-                System.out.println("Save");
-            }
-        }
-    };
-
-    public ActionListener LoadAs = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("LoadAs");
-
-
-
-
-        }
-    };
-    */
 
 
 }

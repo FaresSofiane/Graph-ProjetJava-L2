@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class Connection {
+public class Aretes {
 
     Sommet g1 = null;
     Sommet g2 = null;
@@ -15,7 +15,7 @@ public class Connection {
     String name = null;
     Color couleur = Color.blue;
 
-    public Connection(Sommet g1 , Sommet g2){
+    public Aretes(Sommet g1 , Sommet g2){
         this.g1 = g1;
         this.g2 = g2;
         this.Nom_Connection= g1.getName() + "<->" + g2.getName();
@@ -26,6 +26,11 @@ public class Connection {
         this.couleur = c;
     }
 
+    public void update(){
+        this.Nom_Connection= g1.getName() + "<->" + g2.getName();
+
+    }
+
     public Color getCouleur(){
 
         return this.couleur;
@@ -34,6 +39,10 @@ public class Connection {
     public Sommet getG1(){
 
         return this.g1;
+    }
+
+    public String getNom_Connection(){
+        return this.Nom_Connection;
     }
 
     public Sommet getG2(){

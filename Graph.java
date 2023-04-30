@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class Graph {
     ArrayList <Sommet> sommets = new ArrayList <Sommet>();
-    ArrayList <Connection> Liste_Connection = new ArrayList <Connection>();
+    ArrayList <Aretes> aretes = new ArrayList <Aretes>();
 
     int Taille = Main.TAILLE_SOMMET;
     Dimension Dimension_MenuBar;
@@ -21,95 +21,117 @@ public class Graph {
 
     }
 
-        public Sommet addSommet(String Name, int x, int y, Color Couleur){
-            Sommet s = new Sommet();
-            s.ChangeName(Name);
-            s.setCoor(x, y);
-            s.setCouleur(Couleur);
-            sommets.add(s);
+    public void setGraph(){
+        sommets.clear();
+        aretes.clear();
+
+        this.sommets = new ArrayList <Sommet>();
+
+    }
+
+    public Sommet addSommet(String Name, int x, int y, Color Couleur){
+        Sommet s = new Sommet();
+        for (int i = 0; i < sommets.size(); i++) {
+            if (sommets.get(i).getName().equals(Name)) {
+                Name = Name + "1";
+            }
+        }
+        s.ChangeName(Name);
+        s.setCoor(x, y);
+        s.setCouleur(Couleur);
+        sommets.add(s);
         return sommets.get(sommets.size()-1);
-        }
+    }
 
-        public void deleteSommet(MouseEvent e){
-            ArrayList <Sommet> Liste = new ArrayList <Sommet>();
-            ArrayList <Connection> temp_Liste_Connection = new ArrayList <Connection>();
+    public void deleteSommet(MouseEvent e){
+        ArrayList <Sommet> Liste = new ArrayList <Sommet>();
+        ArrayList <Aretes> temp_aretes = new ArrayList <Aretes>();
 
-            for (int i = 0; i < sommets.size(); i++) {
-                if (e.getX() >= sommets.get(i).x + 10 && e.getX() <= sommets.get(i).x + Taille + 10) {
-                    if (e.getY() + Dimension_MenuBar.height + (Taille - 10) >= sommets.get(i).y && e.getY() <= sommets.get(i).y + Taille) {
+        for (int i = 0; i < sommets.size(); i++) {
+            if (e.getX() >= sommets.get(i).x + 10 && e.getX() <= sommets.get(i).x + Taille + 10) {
+                if (e.getY() + Dimension_MenuBar.height + (Taille - 10) >= sommets.get(i).y && e.getY() <= sommets.get(i).y + Taille) {
 
-                        if (Liste_Connection.size() > 0) {
-                            for (int j = 0; j < Liste_Connection.size(); j++) {
-                                if (Liste_Connection.get(j).g1 != sommets.get(i) && Liste_Connection.get(j).g2 != sommets.get(i)) {
-                                    temp_Liste_Connection.add(Liste_Connection.get(j));
-                                }
+                    if (aretes.size() > 0) {
+                        for (int j = 0; j < aretes.size(); j++) {
+                            if (aretes.get(j).g1 != sommets.get(i) && aretes.get(j).g2 != sommets.get(i)) {
+                                temp_aretes.add(aretes.get(j));
                             }
-                            Liste_Connection.clear();
-                            Liste_Connection.addAll(temp_Liste_Connection);
-                            temp_Liste_Connection.clear();
                         }
-                        sommets.remove(i);
+                        aretes.clear();
+                        aretes.addAll(temp_aretes);
+                        temp_aretes.clear();
                     }
-
-                }
-            }
-        }
-
-        public void deleteConnection(Connection c){
-            Liste_Connection.remove(c);
-        }
-
-
-
-        public Sommet Find_Sommet(int x, int y){
-            for (int i = 0; i < this.sommets.size(); i++) {
-                if (x >= this.sommets.get(i).getX() + 10 && x <= this.sommets.get(i).getX() + Taille + 10) {
-                    if (y + Dimension_MenuBar.height + (Taille - 10) >= this.sommets.get(i).getY() && y <= this.sommets.get(i).getY() + Taille) {
-                        return this.sommets.get(i);
-
-                    }
+                    sommets.remove(i);
                 }
 
             }
-            return null;
         }
+    }
 
-        public Boolean Already_Exist_Connection(Sommet g1, Sommet g2){
-            for (int i = 0; i < Liste_Connection.size(); i++) {
-                if (Liste_Connection.get(i).g1 == g1 && Liste_Connection.get(i).g2 == g2 || Liste_Connection.get(i).g1 == g2 && Liste_Connection.get(i).g2 == g1) {
-                    return true;
+    public void deleteAretes(Aretes c){
+        aretes.remove(c);
+    }
+
+    public Sommet Find_Sommet_Name(String Name){
+        for (int i = 0; i < sommets.size(); i++) {
+            if (sommets.get(i).getName().equals(Name)) {
+                return sommets.get(i);
+            }
+        }
+        return null;
+    }
+
+
+
+    public Sommet Find_Sommet(int x, int y){
+        for (int i = 0; i < this.sommets.size(); i++) {
+            if (x >= this.sommets.get(i).getX() + 10 && x <= this.sommets.get(i).getX() + Taille + 10) {
+                if (y + Dimension_MenuBar.height + (Taille - 10) >= this.sommets.get(i).getY() && y <= this.sommets.get(i).getY() + Taille) {
+                    return this.sommets.get(i);
+
                 }
             }
-            return false;
-        }
-
-
-
-
-        public void addConnection(Sommet g1, Sommet g2) {
-            Connection c = new Connection(g1, g2);
-            Liste_Connection.add(c);
 
         }
+        return null;
+    }
 
-        public void Clear(){
-            sommets.clear();
-            Liste_Connection.clear();
+    public Boolean Already_Exist_Aretes(Sommet g1, Sommet g2){
+        for (int i = 0; i < aretes.size(); i++) {
+            if (aretes.get(i).g1 == g1 && aretes.get(i).g2 == g2 || aretes.get(i).g1 == g2 && aretes.get(i).g2 == g1) {
+                return true;
+            }
         }
-
-        public ArrayList<Sommet> getSommets() {
-            return sommets;
-        }
-
-        public ArrayList<Connection> getConnection() {
-            return Liste_Connection;
-        }
+        return false;
+    }
 
 
 
-        public void setSommets(ArrayList<Sommet> sommets) {
-            this.sommets = sommets;
-        }
+
+    public void addConnection(Sommet g1, Sommet g2) {
+        Aretes c = new Aretes(g1, g2);
+        aretes.add(c);
+
+    }
+
+    public void Clear(){
+        sommets.clear();
+        aretes.clear();
+    }
+
+    public ArrayList<Sommet> getSommets() {
+        return sommets;
+    }
+
+    public ArrayList<Aretes> getAretes() {
+        return aretes;
+    }
+
+
+
+    public void setSommets(ArrayList<Sommet> sommets) {
+        this.sommets = sommets;
+    }
 
 
 }

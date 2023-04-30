@@ -1,20 +1,19 @@
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ArrayList;
 
 public class GraphDisplay extends JFrame {
 
     private Sommet G1 = null;
-    private int taille_sommet = Main.TAILLE_SOMMET;
+    int taille_sommet = Main.TAILLE_SOMMET;
     private Sommet G1_Connection, G2_Connection = null;
-    private boolean est_maintenue = false;
+    private Boolean est_maintenue = false;
     private Boolean mouse_ajoute_enable = true;
+    private Boolean mouse_arete_edit_enable = true;
     public static JPanel panel = new JPanel();
-    private Graph_ToolBar tb = new Graph_ToolBar();
+    Graph_ToolBar tb = new Graph_ToolBar();
     static Graph G = null;
     private Color Couleur_Sommet = Color.blue;
     private XML_Graph xml = null;
@@ -33,75 +32,133 @@ public class GraphDisplay extends JFrame {
         this.setVisible(true);
         Dimension Dimension_MenuBar = tb.getSize();
         G = new Graph(Dimension_MenuBar);
+        ActionListener SaveAs = e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Specify a file to save");
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier XML", "xml");
+            fileChooser.addChoosableFileFilter(filter);
+            int userSelection = fileChooser.showSaveDialog(GraphDisplay.this);
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                xml = new XML_Graph(GraphDisplay.G);
+                xml.Save(new File(fileToSave + ".xml"));
 
-        tb.addButton(new ImageIcon("png/data-storage.png"), "Enregistrer sous", e -> {xml = new XML_Graph(GraphDisplay.G.getSommets());
-            GraphDisplay.G.setSommets(xml.Open(new File("XML_résultat.xml")));repaint();});
+                System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+            }
+        };
+
+        ActionListener Save = e -> {
+            if (xml == null) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Specify a file to save");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier XML", "xml");
+                fileChooser.addChoosableFileFilter(filter);
+                int userSelection = fileChooser.showSaveDialog(GraphDisplay.this);
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToSave = fileChooser.getSelectedFile();
+                    xml = new XML_Graph(GraphDisplay.G);
+                    xml.Save(new File(fileToSave + ".xml"));
+
+                    System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+                }
+            } else {
+                xml.Save(xml.getFile());
+            }
+        };
+
+        ActionListener Load = e -> {
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Specify a file to load");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier XML", "xml");
+                fileChooser.addChoosableFileFilter(filter);
+                int userSelection = fileChooser.showOpenDialog(GraphDisplay.this);
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToLoad = fileChooser.getSelectedFile();
+                    xml = new XML_Graph(GraphDisplay.G);
+                    xml.Open(fileToLoad);
+                    repaint();
+                    System.out.println("Load file: " + fileToLoad.getAbsolutePath());
+                }
+            };
+        tb.addButton(new ImageIcon("png/enregistrer-sous.png"), "Enregistrer sous",SaveAs );
+        tb.addButton(new ImageIcon("png/enregistrer.png"), "Enregistrer un graph", Save);
+
+        tb.addButton(new ImageIcon("png/charger.png"), "Charger un graph", Load);
         tb.Init_Button();
 
-        ActionListener actionListener = new ActionListener() {
+        ActionListener Action_Arete_Edit = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Connection l1[] = new Connection[G.Liste_Connection.size()];
-                for (int i = 0; i < G.Liste_Connection.size(); i++) {
-                    l1[i] = G.Liste_Connection.get(i);
-                }
 
-                JList<Connection> Liste_Connection = new JList<Connection>(l1);
-                Liste_Connection.setCellRenderer(new DefaultListCellRenderer() {
-                    @Override
-                    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                        Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                        if (c instanceof JLabel && value instanceof Connection) {
-                            String name = ((Connection) value).Nom_Connection;
-                            ((JLabel) c).setText(name);
-                        }
-                        return c;
+                mouse_ajoute_enable = true;
+                tb.setState("lock");
+
+
+                if (mouse_arete_edit_enable && mouse_ajoute_enable) {
+                    mouse_arete_edit_enable = false;
+                    Aretes l1[] = new Aretes[G.getAretes().size()];
+                    for (int i = 0; i < G.getAretes().size(); i++) {
+                        l1[i] = G.getAretes().get(i);
                     }
-                });
 
-                JScrollPane Scroll_Liste_Connection = new JScrollPane(Liste_Connection);
-                JButton Color_Button=new JButton("Couleur");
-                JButton Delete=new JButton("Supprimer");
-                JButton Text_Button=new JButton("Nom");
-                JButton Exit_Button=new JButton("Quitter");
-                JTextField Name_Arete = new JTextField();
+                    JList<Aretes> Liste_Connection = new JList<>(l1);
+                    Liste_Connection.setCellRenderer(new DefaultListCellRenderer() {
+                        @Override
+                        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                            Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                            if (c instanceof JLabel && value instanceof Aretes) {
+                                String name = ((Aretes) value).Nom_Connection;
+                                ((JLabel) c).setText(name);
+                            }
+                            return c;
+                        }
+                    });
 
-                Text_Button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if(Liste_Connection.getSelectedValue()!=null){
+                    JScrollPane Scroll_Liste_Connection = new JScrollPane(Liste_Connection);
+                    JButton Color_Button = new JButton("Couleur");
+                    JButton Delete = new JButton("Supprimer");
+                    JButton Text_Button = new JButton("Nom");
+                    JButton Exit_Button = new JButton("Quitter");
+                    JTextField Name_Arete = new JTextField();
+
+
+                    Text_Button.addActionListener(e1 -> {
+                        if (Liste_Connection.getSelectedValue() != null) {
 
                             int x = (Liste_Connection.getSelectedValue().getG1().getX() + Liste_Connection.getSelectedValue().getG2().getX()) / 2;
-                            int y = ((Liste_Connection.getSelectedValue().getG1().getY() + Liste_Connection.getSelectedValue().getG2().y) / 2) + 35;
+                            int y = ((Liste_Connection.getSelectedValue().getG1().getY() + Liste_Connection.getSelectedValue().getG2().getY()) / 2) + 35;
                             Name_Arete.setBounds(x, y, 100, 30);
                             Name_Arete.setText(Liste_Connection.getSelectedValue().Nom_Connection);
                             Name_Arete.setVisible(true);
                             panel.add(Name_Arete);
-                            Name_Arete.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent x) {
-                                    String text = Name_Arete.getText();
-                                    panel.remove(Scroll_Liste_Connection);
-                                    panel.remove(Color_Button);
-                                    panel.remove(Delete);
-                                    panel.remove(Name_Arete);
-                                    panel.remove(Text_Button);
-                                    panel.remove(Exit_Button);
-                                    Liste_Connection.getSelectedValue().setName(text);
-                                    repaint();
-                                }
+                            Name_Arete.addActionListener(x1 -> {
+                                String text = Name_Arete.getText();
+                                panel.remove(Scroll_Liste_Connection);
+                                panel.remove(Color_Button);
+                                panel.remove(Delete);
+                                panel.remove(Name_Arete);
+                                panel.remove(Text_Button);
+                                panel.remove(Exit_Button);
+                                Liste_Connection.getSelectedValue().setName(text);
+                                repaint();
+                                mouse_arete_edit_enable = true;
                             });
                         }
-                    }
-                });
+
+                    });
 
 
-                Delete.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if(Liste_Connection.getSelectedValue()!=null){
+                    Delete.addActionListener(e12 -> {
+                        if (Liste_Connection.getSelectedValue() != null) {
                             System.out.println(Liste_Connection.getSelectedValue().Nom_Connection);
-                            G.deleteConnection(Liste_Connection.getSelectedValue());
+                            G.deleteAretes(Liste_Connection.getSelectedValue());
                             panel.remove(Scroll_Liste_Connection);
                             panel.remove(Color_Button);
                             panel.remove(Delete);
@@ -109,16 +166,13 @@ public class GraphDisplay extends JFrame {
                             panel.remove(Text_Button);
                             panel.remove(Exit_Button);
                             repaint();
+                            mouse_arete_edit_enable = true;
                         }
-                    }
-                });
+                    });
 
 
-
-                Color_Button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if(Liste_Connection.getSelectedValue()!=null){
+                    Color_Button.addActionListener(e13 -> {
+                        if (Liste_Connection.getSelectedValue() != null) {
                             Color Couleur_Arete = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.BLUE);
                             Liste_Connection.getSelectedValue().setCouleur(Couleur_Arete);
                             panel.remove(Scroll_Liste_Connection);
@@ -128,13 +182,11 @@ public class GraphDisplay extends JFrame {
                             panel.remove(Text_Button);
                             panel.remove(Exit_Button);
                             repaint();
+                            mouse_arete_edit_enable = true;
                         }
-                    }
-                });
+                    });
 
-                Exit_Button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
+                    Exit_Button.addActionListener(e14 -> {
                         panel.remove(Scroll_Liste_Connection);
                         panel.remove(Color_Button);
                         panel.remove(Delete);
@@ -142,33 +194,51 @@ public class GraphDisplay extends JFrame {
                         panel.remove(Text_Button);
                         panel.remove(Exit_Button);
                         repaint();
+                        mouse_arete_edit_enable = true;
+                    });
+
+                    if (G.getAretes().size() != 0) {
+                        Delete.setVisible(true);
+                        Color_Button.setVisible(true);
+                        Text_Button.setVisible(true);
+                        Scroll_Liste_Connection.setVisible(true);
+                        Exit_Button.setVisible(true);
+                        Liste_Connection.setVisible(true);
+
+
+                        Delete.setBounds(110, 10, 80, 30);
+                        Color_Button.setBounds(110, 60, 80, 30);
+                        Scroll_Liste_Connection.setBounds(0, 0, 100, 200);
+                        Text_Button.setBounds(110, 110, 80, 30);
+                        Exit_Button.setBounds(110, 160, 80, 30);
+
+                        panel.add(Exit_Button);
+                        panel.add(Text_Button);
+                        panel.add(Scroll_Liste_Connection);
+                        panel.add(Delete);
+                        panel.add(Color_Button);
+
+                        Liste_Connection.repaint();
+
+                        repaint();
+                    }else {
+                        JOptionPane.showMessageDialog(null, "Aucun lien n'a été créé", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
-                });
+                    mouse_arete_edit_enable = true;
+                    tb.setState("Ajouter");
 
-                if (G.Liste_Connection.size() != 0) {
-                    Delete.setVisible(true);
-                    Color_Button.setVisible(true);
-                    Text_Button.setVisible(true);
-                    Scroll_Liste_Connection.setVisible(true);
-
-                    Delete.setBounds(200,100,80,30);
-                    Color_Button.setBounds(200,150,80,30);
-                    Scroll_Liste_Connection.setBounds(0, 0, 100, 200);
-                    Text_Button.setBounds(200,200,80,30);
-                    Exit_Button.setBounds(200,250,80,30);
-
-                    panel.add(Exit_Button);
-                    panel.add(Text_Button);
-                    panel.add(Scroll_Liste_Connection);
-                    panel.add(Delete);
-                    panel.add(Color_Button);
-
-                    repaint();
                 }
-
             }
         };
-        tb.addButton(new ImageIcon("png/lien-delete.png"), "Modifier un lien",actionListener);
+        tb.addButton(new ImageIcon("png/arete-edit.png"), "Modifier un lien",Action_Arete_Edit);
+        tb.addSeparator();
+
+        ActionListener AllDelete = e -> {
+            G.Clear();
+            repaint();
+        };
+        tb.addButton(new ImageIcon("png/corbeille.png"), "Supprimer le graph",AllDelete);
+
 
 
         panel.addMouseListener(new MouseAdapter() {
@@ -178,7 +248,7 @@ public class GraphDisplay extends JFrame {
 
                 if (e.getButton() == MouseEvent.BUTTON1) {
 
-                    if (tb.getState().equals("Ajouter") && mouse_ajoute_enable) {
+                    if (tb.getState().equals("Ajouter") && mouse_ajoute_enable && mouse_arete_edit_enable) {
 
                         mouse_ajoute_enable = false;
                         Sommet Sommet_Temp = G.addSommet("", e.getX(), e.getY(), Color.blue);
@@ -186,11 +256,8 @@ public class GraphDisplay extends JFrame {
 
                         JButton Bouton_Couleur_Panel = new JButton("Couleur");
                         Bouton_Couleur_Panel.setBounds(100, 50, 100, 30);
-                        Bouton_Couleur_Panel.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                Couleur_Sommet = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue); // on ouvre la fenetre de choix de couleur
-                            }
+                        Bouton_Couleur_Panel.addActionListener(e15 -> {
+                            Couleur_Sommet = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue); // on ouvre la fenetre de choix de couleur
                         });
 
                         JLabel Label_Nom_Sommet = new JLabel("Nom :");
@@ -210,43 +277,53 @@ public class GraphDisplay extends JFrame {
                         panel.add(Label_Enter_Validation);
                         panel.add(Bouton_Couleur_Panel);
 
-                        Saisie_Nom_Sommet.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent x) {
+                        Saisie_Nom_Sommet.addActionListener(x -> {
 
-                                panel.remove(Saisie_Nom_Sommet);
-                                panel.remove(Bouton_Couleur_Panel);
-                                panel.remove(Label_Nom_Sommet);
-                                panel.remove(Label_Enter_Validation);
+                            panel.remove(Saisie_Nom_Sommet);
+                            panel.remove(Bouton_Couleur_Panel);
+                            panel.remove(Label_Nom_Sommet);
+                            panel.remove(Label_Enter_Validation);
 
-                                Sommet_Temp.ChangeName(Saisie_Nom_Sommet.getText());
-                                Sommet_Temp.setCouleur(Couleur_Sommet);
-
-                                repaint();
-                                mouse_ajoute_enable = true;
-
+                            String Name = Saisie_Nom_Sommet.getText();
+                            for (int i = 0; i < G.getSommets().size(); i++) {
+                                if (G.getSommets().get(i).getName().equals(Saisie_Nom_Sommet.getText())){
+                                    JOptionPane.showMessageDialog(null, "Ce nom est déjà utilisé", "Erreur", JOptionPane.ERROR_MESSAGE);
+                                    Name = "";
+                                    G.getSommets().remove(Sommet_Temp);
+                                    repaint();
+                                    mouse_ajoute_enable = true;
+                                    return;
+                                }
                             }
+
+
+                            Sommet_Temp.ChangeName(Name);
+                            Sommet_Temp.setCouleur(Couleur_Sommet);
+
+                            repaint();
+                            mouse_ajoute_enable = true;
+
                         });
 
-                    } else if (tb.getState().equals("Supprimer")) {
+                    } else if (tb.getState().equals("Supprimer") && mouse_ajoute_enable && mouse_arete_edit_enable) {
                         G.deleteSommet(e);
                         repaint();
 
-                    } else if (tb.getState().equals("Modifier")) {
+                    } else if (tb.getState().equals("Deplacer") && mouse_arete_edit_enable && mouse_ajoute_enable) {
                         if (G.Find_Sommet(e.getX(), e.getY()) != null) {
                             G1 = G.Find_Sommet(e.getX(), e.getY());
                             est_maintenue = true;
                         }
 
-                    } else if (tb.getState().equals("Relier")) {
+                    } else if (tb.getState().equals("Relier") && mouse_arete_edit_enable && mouse_ajoute_enable) {
                         if (G.Find_Sommet(e.getX(), e.getY()) != null) {
                             if (G1_Connection == null) {
                                 G1_Connection = G.Find_Sommet(e.getX(), e.getY());
                             } else if (G2_Connection == null && G1_Connection != G.Find_Sommet(e.getX(), e.getY())) {
                                 G2_Connection = G.Find_Sommet(e.getX(), e.getY());
                             }
-                            if (G1_Connection != null && G2_Connection != null) {
-                                if (G.Already_Exist_Connection(G1_Connection, G2_Connection)) {
+                            if (G1_Connection != null && G2_Connection != null && G1_Connection != G2_Connection) {
+                                if (G.Already_Exist_Aretes(G1_Connection, G2_Connection)) {
                                     G1_Connection = null;
                                     G2_Connection = null;
                                     repaint();
@@ -258,6 +335,29 @@ public class GraphDisplay extends JFrame {
                                 repaint();
                             }
                         }
+                    } else if (tb.getState().equals("Renommer") && mouse_ajoute_enable && mouse_arete_edit_enable ) {
+
+                        if (G.Find_Sommet(e.getX(), e.getY()) != null) {
+                            Sommet Sommet_Temp = G.Find_Sommet(e.getX(), e.getY());
+                            String Nom_Temp = JOptionPane.showInputDialog(null, "Entrez le nouveau nom du sommet", "Renommer", JOptionPane.QUESTION_MESSAGE);
+                            if (Nom_Temp != null) {
+                                Sommet_Temp.ChangeName(Nom_Temp);
+                                repaint();
+                                for (int i = 0; i<G.getAretes().size(); i++){
+                                    G.getAretes().get(i).update();
+                                }
+                            }
+                        }
+                    } else if (tb.getState().equals("Couleur") && mouse_ajoute_enable && mouse_arete_edit_enable) {
+                        if (G.Find_Sommet(e.getX(),e.getY()) != null){
+                            Sommet Sommet_Temp = G.Find_Sommet(e.getX(),e.getY());
+                            Color Couleur_Temp = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue); // on ouvre la fenetre de choix de couleur
+                            if (Couleur_Temp != null){
+                                Sommet_Temp.setCouleur(Couleur_Temp);
+                                repaint();
+                            }
+                        }
+
                     }
 
                 }
@@ -295,19 +395,14 @@ public class GraphDisplay extends JFrame {
 
     }
 
-    public static void main(String[] args) {
-
-        new GraphDisplay();
-    }
-
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        for (int i = 0; i < this.G.getConnection().size(); i++) {
-            this.G.getConnection().get(i).Create(g, tb.getSize().height, taille_sommet);
+        for (int i = 0; i < G.getAretes().size(); i++) {
+            G.getAretes().get(i).Create(g, tb.getSize().height, taille_sommet);
         }
-        for (int i = 0; i < this.G.getSommets().size(); i++) {
-            this.G.getSommets().get(i).Create(g, tb.getSize().height, taille_sommet);
+        for (int i = 0; i < G.getSommets().size(); i++) {
+            G.getSommets().get(i).Create(g, tb.getSize().height, taille_sommet);
 
         }
 

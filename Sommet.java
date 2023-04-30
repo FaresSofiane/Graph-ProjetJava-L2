@@ -47,7 +47,6 @@ public class Sommet {
 
     public Graphics Create(Graphics g, int Hauteur_ToolBar, int Taille){
 
-
         FontMetrics fm = g.getFontMetrics();
         int textWidth = fm.stringWidth(this.getName());
         int textHeight = fm.getHeight();
