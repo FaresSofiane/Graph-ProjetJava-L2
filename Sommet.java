@@ -55,13 +55,17 @@ public class Sommet {
         int centerY = y + Taille/2;
         int textX = centerX - (textWidth / 2);
         int textY = centerY + (textHeight / 4) ;
-        g.setColor(Color.BLACK);
-        g.drawOval(this.x, this.y+Hauteur_ToolBar, Taille, Taille);
-        g.setColor(this.Couleur);
-        g.fillOval(this.x, this.y+Hauteur_ToolBar, Taille, Taille);
-        g.setColor(Color.black);
-        g.setFont(new Font("Arial", Font.PLAIN, 24));
-        g.drawString(this.getName(), textX , textY + Hauteur_ToolBar);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setStroke(new BasicStroke(2));
+        g2d.setColor(Color.BLACK);
+        g2d.drawOval(this.x, this.y+Hauteur_ToolBar, Taille, Taille);
+        g2d.setColor(this.Couleur);
+        g2d.fillOval(this.x, this.y+Hauteur_ToolBar, Taille, Taille);
+        g2d.setColor(Color.black);
+        g2d.setFont(new Font("Arial", Font.PLAIN, 24));
+        g2d.drawString(this.getName(), textX , textY + Hauteur_ToolBar);
+
+
         return g;
     }
 

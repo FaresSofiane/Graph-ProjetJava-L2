@@ -9,6 +9,8 @@ public class Connection {
     int x2 = 0;
     int y2 = 0;
 
+    String Nom_Connection;
+
 
     String name = null;
     Color couleur = Color.blue;
@@ -16,6 +18,7 @@ public class Connection {
     public Connection(Sommet g1 , Sommet g2){
         this.g1 = g1;
         this.g2 = g2;
+        this.Nom_Connection= g1.getName() + "<->" + g2.getName();
     }
 
     public void setCouleur(Color c){
@@ -70,25 +73,25 @@ public class Connection {
 
     public Graphics Create(Graphics g, int Hauteur_ToolBar, int Taille){
 
-        int x1 = this.g1.x ;
-        int y1 = this.g1.y ;
-        int x2 = this.g2.x ;
-        int y2 = this.g2.y ;
-
+        this.x1 = this.g1.x + Taille/2;
+        this.y1 = this.g1.y + Taille/2 + Hauteur_ToolBar;
+        this.x2 = this.g2.x + Taille/2;
+        this.y2 = this.g2.y + Taille/2 + Hauteur_ToolBar;
 
         Graphics2D L1 = (Graphics2D) g;
         L1.setStroke(new BasicStroke(5));
 
-        this.x1 = x1 + Taille/2;
-        this.y1 = y1 + Taille/2 + Hauteur_ToolBar;
-        this.x2 = x2 + Taille/2;
-        this.y2 = y2 + Taille/2 + Hauteur_ToolBar;
-
 
         L1.setPaint(this.getCouleur());
-        L1.drawLine(x1 + Taille/2, y1+Hauteur_ToolBar + Taille/2, x2 + Taille/2, y2 + Hauteur_ToolBar + Taille/2);
+        L1.drawLine(this.x1, this.y1, this.x2, this.y2);
         if (this.getName() != null){
-            L1.drawString(this.getName(),(x1+x2)/2,(y1+y2)/2);
+            FontMetrics fm = g.getFontMetrics();
+            int textWidth = fm.stringWidth(this.getName());
+            int textHeight = fm.getHeight();
+            L1.setFont(new Font("Arial", Font.PLAIN, 14));
+            int textX = (x1+x2)/2 - (textWidth / 2) + 25;
+            int textY = (y1+y2)/2 + (textHeight / 4) + 25 ;
+            L1.drawString(this.getName(),textX,textY);
         }
 
         return g;

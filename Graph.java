@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -54,23 +55,11 @@ public class Graph {
             }
         }
 
-        public void deleteConnection(MouseEvent e){
-            ArrayList <Connection> temp_Liste_Connection = new ArrayList <Connection>();
-
-            for (int i = 0; i < Liste_Connection.size(); i++) {
-                int x1 = Liste_Connection.get(i).g1.getX() ;
-                int y1 = Liste_Connection.get(i).g1.getY() ;
-                int x2 = Liste_Connection.get(i).g2.getX() ;
-                int y2 = Liste_Connection.get(i).g2.getY() ;
-
-                double distance = Math.abs((y2 - y1) * e.getX() - (x2 - x1) * e.getY() + x2 * y1 - y2 * x1) / Math.sqrt(Math.pow(y2 - y1, 3) + Math.pow(x2 - x1, 3));
-                if (distance <= 1){
-                    temp_Liste_Connection.add(Liste_Connection.get(i));
-                }
-            }
-            Liste_Connection.removeAll(temp_Liste_Connection);
-            temp_Liste_Connection.clear();
+        public void deleteConnection(Connection c){
+            Liste_Connection.remove(c);
         }
+
+
 
         public Sommet Find_Sommet(int x, int y){
             for (int i = 0; i < this.sommets.size(); i++) {
@@ -84,32 +73,16 @@ public class Graph {
             }
             return null;
         }
-        public Boolean Find_Connection(int x, int y) {
-            for (int i = 0; i < this.Liste_Connection.size(); i++) {
-                int x1 = this.Liste_Connection.get(i).getX1();
-                int y1 = this.Liste_Connection.get(i).getY1() ;
-                int x2 = this.Liste_Connection.get(i).getX2();
-                int y2 = this.Liste_Connection.get(i).getY2() ;
-                int lineWidth = 5;
 
-
-
-
-                double distance = Math.abs((y2-y1)*x - (x2-x1)*y + x2*y1 - y2*x1) / Math.sqrt((y2-y1)*(y2-y1) + (x2-x1)*(x2-x1));
-
-                // Vérifier si la distance est inférieure ou égale à une tolérance de 1.5 pixels
-                if (distance <= 2.5) {
-                    // Vérifier si les coordonnées du point (x,y) sont situées entre les coordonnées des points (x1,y1) et (x2,y2) le long de l'axe horizontal et vertical
-                    if (Math.min(x1,x2)-2.5 <= x && x <= Math.max(x1,x2)+2.5 && Math.min(y1,y2)-2.5 <= y && y <= Math.max(y1,y2)+2.5) {
-                        System.out.println("true");
-
-                        return true;
-                    }
+        public Boolean Already_Exist_Connection(Sommet g1, Sommet g2){
+            for (int i = 0; i < Liste_Connection.size(); i++) {
+                if (Liste_Connection.get(i).g1 == g1 && Liste_Connection.get(i).g2 == g2 || Liste_Connection.get(i).g1 == g2 && Liste_Connection.get(i).g2 == g1) {
+                    return true;
                 }
-
             }
             return false;
         }
+
 
 
 
@@ -131,6 +104,8 @@ public class Graph {
         public ArrayList<Connection> getConnection() {
             return Liste_Connection;
         }
+
+
 
         public void setSommets(ArrayList<Sommet> sommets) {
             this.sommets = sommets;

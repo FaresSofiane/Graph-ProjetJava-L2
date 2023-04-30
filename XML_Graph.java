@@ -116,7 +116,6 @@ public class XML_Graph {
                     Color C = Couleur.equals("0") ? Color.BLACK : new Color(Integer.parseInt(Couleur));
                     graph.setCouleur(C);
                     this.Liste.add(graph);
-                    System.out.println("Graph " + i + " : " + Name + " // Coordonnées : " + x + " " + y + " // Couleur : " + C);
 
                 }
             }

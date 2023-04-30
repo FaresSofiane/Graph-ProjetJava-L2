@@ -7,13 +7,12 @@ import java.io.File;
 public class Graph_ToolBar extends JToolBar {
 
     private static final String ADD_STATE = "Ajouter";
-    private static final String MODIFY_STATE = "Modifier_Position";
+    private static final String MODIFY_STATE = "Deplacer";
+    private static final String RENAME_STATE = "Renommer";
     private static final String DELETE_STATE = "Supprimer";
-    private static final String CLEAR_STATE = "ToutEffacer";
-    private static final String CONNECT_STATE = "Connect";
-    private static final String EDIT_CONNECT_STATE = "Edit_Connect";
-    private static final String ADD_TEXT_CONNECT_STATE = "Add_Text_Connect";
-    private static final String CHANGE_COLOR_CONNECT_STATE = "Change_Color_Connect";
+    private static final String CONNECT_STATE = "Relier";
+
+
 
 
     File file = null;
@@ -32,19 +31,17 @@ public class Graph_ToolBar extends JToolBar {
         addSeparator();
 
         JButton[] SommetButton = {
-                addButton(new ImageIcon("png/creation.png"), "Ajouter un sommet", e -> setState(ADD_STATE)),
-                addButton(new ImageIcon("png/pencil.png"), "Modifier", e -> setState(MODIFY_STATE)),
-                addButton(new ImageIcon("png/remove.png"), "Supprimer", e -> setState(DELETE_STATE)),
-                addButton(new ImageIcon("png/delete-all.png"), "Tout effacer", e -> setState(CLEAR_STATE))
+                addButton(new ImageIcon("png/ajouter.png"), "Ajouter un sommet", e -> setState(ADD_STATE)),
+                addButton(new ImageIcon("png/deplacer.png"), "Modifier un sommet", e -> setState(MODIFY_STATE)),
+                addButton(new ImageIcon("png/renommer.png"), "Renommer un sommet", e -> setState(RENAME_STATE)),
+                addButton(new ImageIcon("png/effacer.png"), "Supprimer", e -> setState(DELETE_STATE)),
         };
 
         addSeparator();
 
         JButton[] connectButtons = {
                 addButton(new ImageIcon("png/lien-connecte.png"), "Relier deux sommets", e -> setState(CONNECT_STATE)),
-                addButton(new ImageIcon("png/lien-delete.png"), "Modifier un lien", e -> setState(EDIT_CONNECT_STATE)),
-                addButton(new ImageIcon("png/lien-add-text.png"), "Ajouter un texte à un lien", e -> setState(ADD_TEXT_CONNECT_STATE)),
-                addButton(new ImageIcon("png/lien-color.png"), "Changer la couleur d'un lien", e -> setState(CHANGE_COLOR_CONNECT_STATE))
+
         };
 
         for (JButton button : SommetButton) {
