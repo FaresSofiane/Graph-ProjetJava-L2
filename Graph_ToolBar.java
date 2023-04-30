@@ -1,10 +1,17 @@
 import javax.swing.*;
-import javax.swing.plaf.PanelUI;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+/*
+
+Sofiane Fares
+Github : github.com/FaresSofiane
+
+*/
+
 public class Graph_ToolBar extends JToolBar {
+
+
 
     private static final String ADD_STATE = "Ajouter";
     private static final String MODIFY_STATE = "Deplacer";
@@ -14,16 +21,12 @@ public class Graph_ToolBar extends JToolBar {
     private static final String COLOR_STATE = "Couleur";
 
 
-
-
     File file = null;
     XML_Graph xml = null;
     private String state = ADD_STATE;
 
     public Graph_ToolBar() {
         setFloatable(false);
-
-
 
 
     }
@@ -69,12 +72,12 @@ public class Graph_ToolBar extends JToolBar {
         return button;
     }
 
-    public void setState(String state) {
-        this.state = state;
-    }
-
     public String getState() {
         return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
 

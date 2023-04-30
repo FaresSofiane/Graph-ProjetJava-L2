@@ -1,20 +1,29 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+/*
+
+Sofiane Fares
+Github : github.com/FaresSofiane
+
+*/
 
 public class GraphDisplay extends JFrame {
 
-    private Sommet G1 = null;
+    public static JPanel panel = new JPanel();
+    static Graph G = null;
     int taille_sommet = Main.TAILLE_SOMMET;
+    Graph_ToolBar tb = new Graph_ToolBar();
+    private Sommet G1 = null;
     private Sommet G1_Connection, G2_Connection = null;
     private Boolean est_maintenue = false;
     private Boolean mouse_ajoute_enable = true;
     private Boolean mouse_arete_edit_enable = true;
-    public static JPanel panel = new JPanel();
-    Graph_ToolBar tb = new Graph_ToolBar();
-    static Graph G = null;
     private Color Couleur_Sommet = Color.blue;
     private XML_Graph xml = null;
 
@@ -22,16 +31,18 @@ public class GraphDisplay extends JFrame {
     public GraphDisplay() {
 
         super(Main.TITLE);
+
         this.add(panel);
-
-
         this.add(tb, BorderLayout.NORTH);
+
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setMinimumSize(new Dimension(800, 600));
         this.setSize(Main.WIDTH_WINDOWS, Main.HEIGHT_WINDOWS);
         this.setVisible(true);
+
         Dimension Dimension_MenuBar = tb.getSize();
         G = new Graph(Dimension_MenuBar);
+
         ActionListener SaveAs = e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Specify a file to save");
@@ -72,24 +83,24 @@ public class GraphDisplay extends JFrame {
 
         ActionListener Load = e -> {
 
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Specify a file to load");
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fileChooser.setAcceptAllFileFilterUsed(false);
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier XML", "xml");
-                fileChooser.addChoosableFileFilter(filter);
-                int userSelection = fileChooser.showOpenDialog(GraphDisplay.this);
-                if (userSelection == JFileChooser.APPROVE_OPTION) {
-                    File fileToLoad = fileChooser.getSelectedFile();
-                    xml = new XML_Graph(GraphDisplay.G);
-                    xml.Open(fileToLoad);
-                    repaint();
-                    System.out.println("Load file: " + fileToLoad.getAbsolutePath());
-                }
-            };
-        tb.addButton(new ImageIcon("png/enregistrer-sous.png"), "Enregistrer sous",SaveAs );
-        tb.addButton(new ImageIcon("png/enregistrer.png"), "Enregistrer un graph", Save);
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Specify a file to load");
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier XML", "xml");
+            fileChooser.addChoosableFileFilter(filter);
+            int userSelection = fileChooser.showOpenDialog(GraphDisplay.this);
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToLoad = fileChooser.getSelectedFile();
+                xml = new XML_Graph(GraphDisplay.G);
+                xml.Open(fileToLoad);
+                repaint();
+                System.out.println("Load file: " + fileToLoad.getAbsolutePath());
+            }
+        };
 
+        tb.addButton(new ImageIcon("png/enregistrer-sous.png"), "Enregistrer sous", SaveAs);
+        tb.addButton(new ImageIcon("png/enregistrer.png"), "Enregistrer un graph", Save);
         tb.addButton(new ImageIcon("png/charger.png"), "Charger un graph", Load);
         tb.Init_Button();
 
@@ -103,7 +114,7 @@ public class GraphDisplay extends JFrame {
 
                 if (mouse_arete_edit_enable && mouse_ajoute_enable) {
                     mouse_arete_edit_enable = false;
-                    Aretes l1[] = new Aretes[G.getAretes().size()];
+                    Aretes[] l1 = new Aretes[G.getAretes().size()];
                     for (int i = 0; i < G.getAretes().size(); i++) {
                         l1[i] = G.getAretes().get(i);
                     }
@@ -221,7 +232,7 @@ public class GraphDisplay extends JFrame {
                         Liste_Connection.repaint();
 
                         repaint();
-                    }else {
+                    } else {
                         JOptionPane.showMessageDialog(null, "Aucun lien n'a été créé", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                     mouse_arete_edit_enable = true;
@@ -230,15 +241,14 @@ public class GraphDisplay extends JFrame {
                 }
             }
         };
-        tb.addButton(new ImageIcon("png/arete-edit.png"), "Modifier un lien",Action_Arete_Edit);
+        tb.addButton(new ImageIcon("png/arete-edit.png"), "Modifier un lien", Action_Arete_Edit);
         tb.addSeparator();
 
         ActionListener AllDelete = e -> {
             G.Clear();
             repaint();
         };
-        tb.addButton(new ImageIcon("png/corbeille.png"), "Supprimer le graph",AllDelete);
-
+        tb.addButton(new ImageIcon("png/corbeille.png"), "Supprimer le graph", AllDelete);
 
 
         panel.addMouseListener(new MouseAdapter() {
@@ -286,7 +296,7 @@ public class GraphDisplay extends JFrame {
 
                             String Name = Saisie_Nom_Sommet.getText();
                             for (int i = 0; i < G.getSommets().size(); i++) {
-                                if (G.getSommets().get(i).getName().equals(Saisie_Nom_Sommet.getText())){
+                                if (G.getSommets().get(i).getName().equals(Saisie_Nom_Sommet.getText())) {
                                     JOptionPane.showMessageDialog(null, "Ce nom est déjà utilisé", "Erreur", JOptionPane.ERROR_MESSAGE);
                                     Name = "";
                                     G.getSommets().remove(Sommet_Temp);
@@ -335,7 +345,7 @@ public class GraphDisplay extends JFrame {
                                 repaint();
                             }
                         }
-                    } else if (tb.getState().equals("Renommer") && mouse_ajoute_enable && mouse_arete_edit_enable ) {
+                    } else if (tb.getState().equals("Renommer") && mouse_ajoute_enable && mouse_arete_edit_enable) {
 
                         if (G.Find_Sommet(e.getX(), e.getY()) != null) {
                             Sommet Sommet_Temp = G.Find_Sommet(e.getX(), e.getY());
@@ -343,16 +353,16 @@ public class GraphDisplay extends JFrame {
                             if (Nom_Temp != null) {
                                 Sommet_Temp.ChangeName(Nom_Temp);
                                 repaint();
-                                for (int i = 0; i<G.getAretes().size(); i++){
+                                for (int i = 0; i < G.getAretes().size(); i++) {
                                     G.getAretes().get(i).update();
                                 }
                             }
                         }
                     } else if (tb.getState().equals("Couleur") && mouse_ajoute_enable && mouse_arete_edit_enable) {
-                        if (G.Find_Sommet(e.getX(),e.getY()) != null){
-                            Sommet Sommet_Temp = G.Find_Sommet(e.getX(),e.getY());
+                        if (G.Find_Sommet(e.getX(), e.getY()) != null) {
+                            Sommet Sommet_Temp = G.Find_Sommet(e.getX(), e.getY());
                             Color Couleur_Temp = JColorChooser.showDialog(null, "Choissisez une Couleur", Color.blue); // on ouvre la fenetre de choix de couleur
-                            if (Couleur_Temp != null){
+                            if (Couleur_Temp != null) {
                                 Sommet_Temp.setCouleur(Couleur_Temp);
                                 repaint();
                             }
@@ -362,7 +372,6 @@ public class GraphDisplay extends JFrame {
 
                 }
             }
-
 
 
             @Override
